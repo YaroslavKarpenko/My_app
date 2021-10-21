@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% for project in projects %}
+            <div class="row d-flex justify-content-center" style="margin-top:50px;">
+                <div class="card" style="width: 700px">
+                    <div class="card-header " style="background-color: #6a8b9c; height: 65px;">
+                        <div class="row">
+                            <div class="col-10 text-white " style="font-size: 25px;">
+                                <a><i class="fa fa-calendar" aria-hidden="true"></i> {{ project.name }}</a>
+                            </div>
+                            <div class="col-1">
+                                <a href="{% url 'project_edit' project.pk %}" class="btn btn-outline-dark form-control" id="btn1" type="submit" style="display: none; width: 38px"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                            </div>
+                            <div class="col-1 ">
+                                <form class="remove_project" method="post"  action="{% url 'project_remove' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="project_id" value="{{ project.pk }}" class="form-control"/>
+                                    <button class="btn btn-outline-dark form-control" id="btn2" type="submit" style="display: none; width: 38px">
+                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-header " style="background-color: #c6c7c9">
+                        <div class="row">
+                            <div class="col-1">
+                                <i class="fa fa-plus" aria-hidden="true" style="font-size:35px;color:#008020"></i>
+                            </div>
+                            <div class="col">
+                                <form class="add_task" method="post" action="{% url 'task_new' %}">
+                                    {% csrf_token %}
+                                    <div class="input-group">
+                                        <input type="hidden" name="project_id" value="{{ project.pk }}"/>
+                                        <input type="text" class="form-control content_task" name="content_task"
+                                               placeholder="Start typing here to create a task..."
+                                               aria-describedby="basic-addon2">
+                                        <div class="input-group-append date" id="datetimepicker1"
+                                             data-target-input="nearest">
+                                            <input type="hidden" name="date_task"
+                                                   class="form-control datetimepicker-input date_task"
+                                                   data-target="#datetimepicker1"/>
+                                            <div class="input-group-append" data-target="#datetimepicker1"
+                                                 data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                            </div>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <input class="form-control btn btn-success" type="submit" value="Add Task">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% for task in project.tasks.all %}
+                        <div class="card-header" id="record" style="background-color: white;">
+                            <div class="row">
+                                <div class="col-1">
+                                    <form method="POST" class="form_check">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="task_id" value="{{ task.pk }}"/>
+                                        <input type="checkbox" class="form-check-input" style="margin-left: 7px" name="checkbox" {% if not task.is_active %}checked="checked"{% endif %}>
+                                    </form>
+                                </div>
+                                <div class="col-9 border-left border-right">
+
+                                    {{ task.content }}
+                                    <div class="row" style="padding-top: 5px">
+                                        <div class="col">
+                                            <u>Deadline</u>:
+                                            {% if task.deadline %}
+                                                {{ task.deadline }}
+                                            {% else %}
+                                                unspecified
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-2">
+                                            <!--<div class="btn-group-vertical" role="group">-->
+                                            <form class="task-up" method="post" action="{% url 'task_up' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="task_id" value="{{ task.pk }}"/>
+                                                <!--<button class="form-control btn btn-light btn-sm " type="submit" id="btn3_record"  style="display: none;"><i class="fa fa-caret-up fa-fw"></i></button>-->
+                                                <button class="btn btn-link btn-sm" type="submit" id="btn3_record"  style="display: none; color: #000000;"><i class="fa fa-caret-up"></i></button>
+                                            </form>
+                                            <form class="task-down" method="post" action="{% url 'task_up' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="task_id" value="{{ task.pk }}"/>
+                                                <!--<button class="form-control btn btn-light btn-sm " type="submit" id="btn4_record"  style="display: none;"><i class="fa fa-caret-down fa-fw"></i></button>-->
+                                                <button class="btn btn-link btn-sm"  type="submit" id="btn4_record"  style="display: none; color: #000000;"><i class="fa fa-caret-down"></i></button>
+
+                                            </form>
+                                            <!--</div>-->
+                                        </div>
+                                        <div class="col-4">
+                                            <a href="{% url 'task_edit' task.pk %}" class="btn btn-outline-dark form-control" id="btn2_record" type="submit" style="display: none; width: 35px"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                        </div>
+                                        <div class="col-4">
+                                            <form class="task-remove" method="post" action="{% url 'task_remove' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="task_id" value="{{ task.pk }}"/>
+                                                <button class="btn btn-outline-dark btn-sm form-control" id="btn1_record" type="submit" style="display: none; width: 35px"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                            </form>
+                                        </div>
+
+                                        <!--<form class="task-remove" method="post">
+                                            <button class="btn btn-success form-control" id="btn1_record" type="submit" style="display: none;"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                        </form>-->
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+        {% block project_new %}
+            <div  style="text-align: center; margin-left: auto; margin-right: auto; margin-top: 70px; margin-bottom: 70px" >
+              <form id="add_project" method="post" action="{% url 'project_new' %}">
+                    {% csrf_token %}
+                    <input style="display: none" type="text" name="{{ form.name.name }}" placeholder="Type name project ...">
+                    <button type="submit" class="btn btn-primary ml-2" style="background-color: #6a8b9c;"><i class="fa fa-plus" aria-hidden="true"></i>  Add To-Do List</button>
+                  </form>
+            </div>
+        {% endblock project_new %}
+
+    {% else %}
+        <div class="d-flex justify-content-center">
+            <h1>You are not logged in</h1>
+        </div>
+    {% endif %}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            let csrftoken = '{{  csrf_token }}'
+            $(".add_task").submit(function (e) {
+                e.preventDefault();
+                if ($(this).serializeArray()[2].value.trim()){
+                    $.ajax({
+                    url: "/task/new/",
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: $(this).serialize(),
+                    success: function (data) {
+                        $(".date_task").val('');
+                        $(".content_task").val('');
+                        window.location.reload()
+                    },
+                });
+                } else {
+                    alert("Field cannot be empty")
+                }
+
+
+            });
+            $(".remove_project").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "/remove/",
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: $(this).serialize(),
+                    success: function (data) {
+                        window.location.reload()
+                    },
+                });
+            });
+            $(".form_check").click(function (e) {
+                //e.preventDefault();
+                $.ajax({
+                    url: "/mark/",
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: $(this).serialize(),
+
+                    success: function (data) {
+                        window.location.reload()
+                    },
+                });
+            });
+            $(".task-up").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "/task/up/",
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: $(this).serialize(),
+
+                    success: function (data) {
+                        console.log("ok")
+                        window.location.reload()
+                    },
+                });
+            });
+            $(".task-down").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "/task/down/",
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: $(this).serialize(),
+
+                    success: function (data) {
+                        console.log("ok")
+                        window.location.reload()
+                    },
+                });
+            });
+            $(".task-remove").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "/task/remove/",
+                    type: "POST",
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: $(this).serialize(),
+
+                    success: function (data) {
+                        console.log("ok")
+                        window.location.reload()
+                    },
+                });
+            });
+            $(document).ready(function () {
+            let csrftoken = '{{  csrf_token }}'
+            $("#add_project").submit(function (e) {
+                e.preventDefault();
+                if ($('input[name="{{ form.name.name }}"]').css('display') === 'none'){
+                    $(this).find('input[name="{{ form.name.name }}"]').show();
+                } else {
+                    $(this).find('input[name="{{ form.name.name }}"]').hide();
+                    $.ajax({
+                        url: "/new/",
+                        type: "POST",
+                        headers: {'X-CSRFToken': csrftoken},
+                        data: $(this).serialize(),
+                        success: function (data) {
+                            window.location.reload()
+                        },
+                        error: function (data) {
+                              alert("Field cannot be empty");
+                          }
+                    });
+                }
+
+            });
+        });
+        });
+
+        $(document).ready(function () {
+            $('#datetimepicker1').datetimepicker();
+            $(document).on('mouseenter', '.card', function () {
+                $(this).find("#btn1").show();
+                $(this).find("#btn2").show();
+            }).on('mouseleave', '.card', function () {
+                $(this).find("#btn1").hide();
+                $(this).find("#btn2").hide();
+            });
+        });
+        $(document).ready(function () {
+            $(document).on('mouseenter', '#record', function () {
+                $(this).find("#btn1_record").show();
+                $(this).find("#btn2_record").show();
+                $(this).find("#btn3_record").show();
+                $(this).find("#btn4_record").show();
+                $(this).find("#btn_arrow1").show();
+                $(this).find("#btn_arrow2").show();
+                $(this).css('background-color', '#ede5d5');
+            }).on('mouseleave', '#record', function () {
+                $(this).find("#btn1_record").hide();
+                $(this).find("#btn2_record").hide();
+                $(this).find("#btn3_record").hide();
+                $(this).find("#btn4_record").hide();
+                $(this).find("#btn_arrow1").hide();
+                $(this).find("#btn_arrow2").hide();
+                $(this).css('background-color', 'white');
+            });
+        });
+    </script>
+
+{% endblock content %}

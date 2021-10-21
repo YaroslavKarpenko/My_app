@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <h1>Edit</h1>
+  <form action="" method="post">{% csrf_token %}
+    {{ form.content|as_crispy_field  }}
+      {{ form.deadline.label }}
+      <div class="input-group date" id="datetimepicker1" data-target-input="nearest" style="margin-top: 8px">
+          {{ form.deadline  }}
+          <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+          </div>
+        </div>
+    <button class="btn btn-info ml-2" type="submit" style="margin-top: 10px">Update</button>
+  </form>
+
+{% endblock content %}
